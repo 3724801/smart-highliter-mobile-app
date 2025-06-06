@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "493287639000",
+    "project_id": "smart-highlighter-b1d3b",
+    "storage_bucket": "smart-highlighter-b1d3b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:493287639000:android:cac2ded7a2799714b614ad",
+        "android_client_info": {
+          "package_name": "com.smarthighlighter.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "493287639000-4hlhag3u8o5bgoiggq7dhnr8ch9omude.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCs_CX40XNDhosLEJx7HBPPvardZWojzoY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "493287639000-4hlhag3u8o5bgoiggq7dhnr8ch9omude.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "493287639000-cenqduqp6ffph8u8k3hf302vf8tekc42.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.untitled"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

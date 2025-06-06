@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- Google Identity Services Client ID -->
+  <meta name="google-signin-client_id" content="493287639000-26a22r1uo5oi763qao18hm1bsgfm2qkf.apps.googleusercontent.com">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="smart_highlighter_mobilefire">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>smart_highlighter_mobilefire</title>
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+  <!-- Google Identity Services Library -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <script>
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDCy5UbtFzEIzoaxlgoCwJWKVRxskWp8y4",
+      authDomain: "smart-highlighter-b1d3b.firebaseapp.com",  // Changed from localhost
+      projectId: "smart-highlighter-b1d3b",
+      storageBucket: "smart-highlighter-b1d3b.appspot.com",
+      messagingSenderId: "493287639000",
+      appId: "1:493287639000:web:cac2ded7a2799714b614ad"  // Changed from android to web
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Google Sign-In handler
+    function handleGoogleSignIn(response) {
+      const credential = firebase.auth.GoogleAuthProvider.credential(response.credential);
+      firebase.auth().signInWithCredential(credential)
+        .then((userCredential) => {
+          // Successfully signed in
+          console.log("Signed in as:", userCredential.user.displayName);
+        })
+        .catch((error) => {
+          console.error("Sign-in error:", error);
+        });
+    }
+
+    // Initialize Google Identity Services
+    window.onload = function() {
+      google.accounts.id.initialize({
+        client_id: '738449830205-2knhpeo319li2cjjcbim4k3b179e5n95.apps.googleusercontent.com',
+        callback: handleGoogleSignIn
+      });
+
+      // Optional: Render button automatically
+      // google.accounts.id.renderButton(
+      //   document.getElementById("google-signin-button"),
+      //   { theme: "outline", size: "large" }
+      // );
+    };
+  </script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://apis.google.com/js/api.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+</head>
+<body>
+<!-- Optional: Add this if you want to render the button manually -->
+<!-- <div id="google-signin-button"></div> -->
+
+<script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
