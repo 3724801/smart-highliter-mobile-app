@@ -167,22 +167,7 @@ class _IntroScreenState extends State<IntroScreen>
                                   child: Container(
                                     width: 40,
                                     height: 40,
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.blue[100]!.withOpacity(0.6),
-                                          Colors.purple[100]!.withOpacity(0.4),
-                                        ],
-                                      ),
-                                      shape: BoxShape.circle,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.blue.withOpacity(0.2),
-                                          blurRadius: 10,
-                                          offset: const Offset(0, 5),
-                                        ),
-                                      ],
-                                    ),
+                                    
                                   ),
                                 ),
                               );
@@ -199,22 +184,7 @@ class _IntroScreenState extends State<IntroScreen>
                                   child: Container(
                                     width: 30,
                                     height: 30,
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.pink[100]!.withOpacity(0.6),
-                                          Colors.orange[100]!.withOpacity(0.4),
-                                        ],
-                                      ),
-                                      shape: BoxShape.circle,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.pink.withOpacity(0.2),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 3),
-                                        ),
-                                      ],
-                                    ),
+                                   
                                   ),
                                 ),
                               );
