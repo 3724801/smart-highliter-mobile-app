@@ -1,114 +1,123 @@
+// lib/models/Highlight.dart
+import 'package:mongo_dart/mongo_dart.dart';
+
 class Highlight {
   final String id;
+  final String userId;
   final String selectedText;
   final String pageTitle;
   final String pageUrl;
-  final String? note;
-  final String? aiAnalysis;
   final String color;
+  final String? note;
   final List<String> tags;
-  final String? userId;
-  final String timestamp;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
 
   Highlight({
     required this.id,
+    required this.userId,
     required this.selectedText,
     required this.pageTitle,
     required this.pageUrl,
-    this.note,
-    this.aiAnalysis,
     required this.color,
+    this.note,
     required this.tags,
-    this.userId,
-    required this.timestamp,
+    required this.createdAt,
+    this.updatedAt,
   });
 
-  // Add a copyWith method for convenience
-  Highlight copyWith({
-    String? id,
-    String? selectedText,
-    String? pageTitle,
-    String? pageUrl,
-    String? note,
-    String? aiAnalysis,
-    String? color,
-    List<String>? tags,
-    String? userId,
-    String? timestamp,
-  }) {
-    return Highlight(
-      id: id ?? this.id,
-      selectedText: selectedText ?? this.selectedText,
-      pageTitle: pageTitle ?? this.pageTitle,
-      pageUrl: pageUrl ?? this.pageUrl,
-      note: note ?? this.note,
-      aiAnalysis: aiAnalysis ?? this.aiAnalysis,
-      color: color ?? this.color,
-      tags: tags ?? this.tags,
-      userId: userId ?? this.userId,
-      timestamp: timestamp ?? this.timestamp,
-    );
-  }
-
-  // Improved fromJson with null safety and debugging
+  // Create Highlight from MongoDB document
   factory Highlight.fromJson(Map<String, dynamic> json) {
-    // Add debug prints to trace the issue
-    print('Processing highlight JSON: ${json['id']}, userId: ${json['userId']}');
-
-    // Handle tags safely - this is a common source of errors
-    List<String> parsedTags = [];
-    if (json['tags'] != null) {
-      if (json['tags'] is List) {
-        parsedTags = List<String>.from(json['tags'].map((tag) => tag.toString()));
-      } else if (json['tags'] is String) {
-        // Handle case where tags might be a comma-separated string
-        parsedTags = (json['tags'] as String).split(',').map((e) => e.trim()).toList();
-      }
-    }
-
     return Highlight(
-      id: json['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString(),
-      selectedText: json['selectedText']?.toString() ?? '',
-      pageTitle: json['pageTitle']?.toString() ?? '',
-      pageUrl: json['pageUrl']?.toString() ?? '',
-      note: json['note']?.toString(),
-      aiAnalysis: json['aiAnalysis']?.toString(),
-      color: json['color']?.toString() ?? 'yellow',
-      tags: parsedTags,
-      userId: json['userId']?.toString(), // Ensure consistent string format
-      timestamp: json['timestamp']?.toString() ?? DateTime.now().toIso8601String(),
+      id: json['_id'] is ObjectId
+          ? json['_id'].toHexString()
+          : json['_id'].toString(),
+      userId: json['userId'] ?? '',
+      selectedText: json['selectedText'] ?? '',
+      pageTitle: json['pageTitle'] ?? '',
+      pageUrl: json['pageUrl'] ?? '',
+      color: json['color'] ?? 'yellow',
+      note: json['note'],
+      tags: List<String>.from(json['tags'] ?? []),
+      createdAt: json['createdAt'] is String
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
+      updatedAt: json['updatedAt'] != null
+          ? (json['updatedAt'] is String
+              ? DateTime.parse(json['updatedAt'])
+              : json['updatedAt'] as DateTime?)
+          : null,
     );
   }
 
-  // To JSON method with null handling
+  // Convert Highlight to MongoDB document
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      '_id': ObjectId.fromHexString(id),
+      'userId': userId,
       'selectedText': selectedText,
       'pageTitle': pageTitle,
       'pageUrl': pageUrl,
-      'note': note,
-      'aiAnalysis': aiAnalysis,
       'color': color,
+      'note': note,
       'tags': tags,
-      'userId': userId,
-      'timestamp': timestamp,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
     };
   }
 
-  // Add equality and toString methods for better debugging
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-          other is Highlight &&
-              runtimeType == other.runtimeType &&
-              id == other.id;
+  // Create a new highlight document for insertion (without _id)
+  Map<String, dynamic> toInsertJson() {
+    return {
+      'userId': userId,
+      'selectedText': selectedText,
+      'pageTitle': pageTitle,
+      'pageUrl': pageUrl,
+      'color': color,
+      'note': note,
+      'tags': tags,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
+    };
+  }
 
-  @override
-  int get hashCode => id.hashCode;
+  // Create a copy with updated fields
+  Highlight copyWith({
+    String? id,
+    String? userId,
+    String? selectedText,
+    String? pageTitle,
+    String? pageUrl,
+    String? color,
+    String? note,
+    List<String>? tags,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return Highlight(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      selectedText: selectedText ?? this.selectedText,
+      pageTitle: pageTitle ?? this.pageTitle,
+      pageUrl: pageUrl ?? this.pageUrl,
+      color: color ?? this.color,
+      note: note ?? this.note,
+      tags: tags ?? this.tags,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 
   @override
   String toString() {
-    return 'Highlight{id: $id, title: $pageTitle, userId: $userId}';
+    return 'Highlight{id: $id, userId: $userId, selectedText: $selectedText, pageTitle: $pageTitle}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Highlight && runtimeType == other.runtimeType && id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
