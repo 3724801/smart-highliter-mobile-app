@@ -14,11 +14,14 @@ class _IntroScreenState extends State<IntroScreen>
   late AnimationController _slideController;
   late AnimationController _scaleController;
   late AnimationController _staggerController;
+  late AnimationController _circleController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<double> _buttonFadeAnimation;
   late Animation<double> _featureFadeAnimation;
+  late Animation<double> _circleAnimation;
+  late Animation<double> _imageTextFadeAnimation;
 
   @override
   void initState() {
@@ -43,6 +46,11 @@ class _IntroScreenState extends State<IntroScreen>
       duration: const Duration(milliseconds: 2000),
       vsync: this,
     );
+
+    _circleController = AnimationController(
+      duration: const Duration(seconds: 3),
+      vsync: this,
+    )..repeat();
 
     _fadeAnimation = Tween<double>(
       begin: 0.0,
@@ -84,6 +92,23 @@ class _IntroScreenState extends State<IntroScreen>
       curve: const Interval(0.6, 1.0, curve: Curves.easeInOut),
     ));
 
+    _circleAnimation = Tween<double>(
+      begin: 0.0,
+      end: 2.0,
+    ).animate(CurvedAnimation(
+      parent: _circleController,
+      curve: Curves.easeInOut,
+    ));
+
+    // Same animation timing as button for image and text
+    _imageTextFadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _staggerController,
+      curve: const Interval(0.3, 0.7, curve: Curves.easeInOut),
+    ));
+
     // Start animations with staggered timing
     _fadeController.forward();
     Future.delayed(const Duration(milliseconds: 200), () {
@@ -103,6 +128,7 @@ class _IntroScreenState extends State<IntroScreen>
     _slideController.dispose();
     _scaleController.dispose();
     _staggerController.dispose();
+    _circleController.dispose();
     super.dispose();
   }
 
@@ -139,75 +165,138 @@ class _IntroScreenState extends State<IntroScreen>
                   // Top spacing
                   SizedBox(height: screenHeight * 0.02),
 
-                  // Image section
-                  ScaleTransition(
-                    scale: _scaleAnimation,
-                    child: FadeTransition(
-                      opacity: _fadeAnimation,
+                  // Image section with same animation as button
+                  FadeTransition(
+                    opacity: _imageTextFadeAnimation,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, 0.3),
+                        end: Offset.zero,
+                      ).animate(CurvedAnimation(
+                        parent: _staggerController,
+                        curve: const Interval(0.3, 0.7,
+                            curve: Curves.easeOut),
+                      )),
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          // Image without background
+                          // Larger image
                           Image.asset(
                             'assets/images/Notes-bro.png',
-                            width: screenWidth * 0.7,
-                            height: screenHeight * 0.35,
+                            width: screenWidth * 0.85, // Increased from 0.7
+                            height: screenHeight * 0.45, // Increased from 0.35
                             fit: BoxFit.contain,
                           ),
 
-                          // Animated decorative elements positioned around the image
+                          // Animated decorative circles
                           AnimatedBuilder(
-                            animation: _fadeAnimation,
+                            animation: _circleAnimation,
                             builder: (context, child) {
                               return Positioned(
                                 top: 0,
                                 right: screenWidth * 0.05,
-                                child: Transform.scale(
-                                  scale: _fadeAnimation.value,
-                                  child: Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.blue[100]!.withOpacity(0.6),
-                                          Colors.purple[100]!.withOpacity(0.4),
+                                child: Transform.rotate(
+                                  angle: _circleAnimation.value * 3.14159,
+                                  child: Transform.scale(
+                                    scale: 1.0 + (_circleAnimation.value * 0.2),
+                                    child: Container(
+                                      width: 50, // Increased size
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.blue[100]!.withOpacity(0.8),
+                                            Colors.purple[100]!.withOpacity(0.6),
+                                          ],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.blue.withOpacity(0.3),
+                                            blurRadius: 12,
+                                            offset: const Offset(0, 4),
+                                          ),
                                         ],
                                       ),
-                                      shape: BoxShape.circle,
-                                      
                                     ),
                                   ),
                                 ),
                               );
                             },
                           ),
+
                           AnimatedBuilder(
-                            animation: _scaleAnimation,
+                            animation: _circleAnimation,
                             builder: (context, child) {
                               return Positioned(
                                 bottom: 10,
                                 left: screenWidth * 0.05,
-                                child: Transform.scale(
-                                  scale: _scaleAnimation.value,
-                                  child: Container(
-                                    width: 30,
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.pink[100]!.withOpacity(0.6),
-                                          Colors.orange[100]!.withOpacity(0.4),
+                                child: Transform.rotate(
+                                  angle: -_circleAnimation.value * 3.14159,
+                                  child: Transform.scale(
+                                    scale: 1.0 + ((_circleAnimation.value + 0.5) % 1.0 * 0.3),
+                                    child: Container(
+                                      width: 40, // Increased size
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.pink[100]!.withOpacity(0.8),
+                                            Colors.orange[100]!.withOpacity(0.6),
+                                          ],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.pink.withOpacity(0.3),
+                                            blurRadius: 10,
+                                            offset: const Offset(0, 3),
+                                          ),
                                         ],
                                       ),
-                                      shape: BoxShape.circle,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.pink.withOpacity(0.2),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 3),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+
+                          // Additional animated circle
+                          AnimatedBuilder(
+                            animation: _circleAnimation,
+                            builder: (context, child) {
+                              return Positioned(
+                                top: screenHeight * 0.15,
+                                left: screenWidth * 0.15,
+                                child: Transform.rotate(
+                                  angle: _circleAnimation.value * 2 * 3.14159,
+                                  child: Transform.scale(
+                                    scale: 0.8 + ((_circleAnimation.value + 0.3) % 1.0 * 0.4),
+                                    child: Container(
+                                      width: 35,
+                                      height: 35,
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.green[100]!.withOpacity(0.7),
+                                            Colors.teal[100]!.withOpacity(0.5),
+                                          ],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
                                         ),
-                                      ],
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.green.withOpacity(0.2),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -221,11 +310,18 @@ class _IntroScreenState extends State<IntroScreen>
 
                   SizedBox(height: screenHeight * 0.04),
 
-                  // Text content section
-                  SlideTransition(
-                    position: _slideAnimation,
-                    child: FadeTransition(
-                      opacity: _fadeAnimation,
+                  // Text content section with same animation as button
+                  FadeTransition(
+                    opacity: _imageTextFadeAnimation,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, 0.3),
+                        end: Offset.zero,
+                      ).animate(CurvedAnimation(
+                        parent: _staggerController,
+                        curve: const Interval(0.3, 0.7,
+                            curve: Curves.easeOut),
+                      )),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
