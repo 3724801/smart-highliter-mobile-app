@@ -7,6 +7,7 @@ import 'screens/splash_screen.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/memorize_screen.dart';
+import 'screens/intro_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,14 +49,17 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const AuthWrapper(),
-        '/welcome': (context) => const WelcomeScreen(),
-        '/signin': (context) => const SignInScreen(),
-        '/home': (context) => const HomeScreen(),
-        '/memorize': (context) => const MemorizeScreen(),
-      },
+     initialRoute: '/splash',
+routes: {
+  '/splash': (context) => const SplashScreen(),
+  '/welcome': (context) => const WelcomeScreen(),
+  '/signin': (context) => const SignInScreen(),
+  '/home': (context) => const HomeScreen(),
+  '/memorize': (context) => const MemorizeScreen(),
+  '/intro': (context) => const IntroScreen(),
+},
+      home: const AuthWrapper(),
+      // home: const SplashScreen(), // Uncomment this line to use SplashScreen as the initial screen
     );
   }
 }
@@ -74,7 +78,7 @@ class AuthWrapper extends StatelessWidget {
 
         if (snapshot.hasData) {
           // User is logged in
-          return const HomeScreen();
+          return const IntroScreen();
         } else {
           // User is not logged in
           return const WelcomeScreen();
