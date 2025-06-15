@@ -2,12 +2,12 @@ import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'screens/sign_in_screen.dart';
-import 'screens/splash_screen.dart';
-import 'screens/welcome_screen.dart';
-import 'screens/home_screen.dart';
-import 'screens/memorize_screen.dart';
-import 'screens/intro_screen.dart';
+import 'Screens/Auth/sign_in_screen.dart';
+import 'Screens/splash_screen.dart';
+import 'Screens/welcome_screen.dart';
+import 'Screens/Home/home_screen.dart';
+import 'Screens/memorize_screen.dart';
+import 'Screens/intro_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
