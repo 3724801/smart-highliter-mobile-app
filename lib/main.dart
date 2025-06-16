@@ -4,11 +4,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'Screens/Auth/sign_in_screen.dart';
-import 'Screens/splash_screen.dart';
+import 'Screens/Splash/splash_screen.dart';
 import 'Screens/welcome_screen.dart';
 import 'Screens/main_screen.dart';
 import 'Screens/memorize_screen.dart';
-import 'Screens/intro_screen.dart';
+import 'Screens/Onboarding/onboarding_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,7 +54,7 @@ class MyApp extends StatelessWidget {
         '/signin': (context) => const SignInScreen(),
         '/home': (context) => const MainScreen(), // MainScreen فيها BottomNavigationBar
         '/memorize': (context) => const MemorizeScreen(),
-        '/intro': (context) => const IntroScreen(),
+        '/onboarding': (context) => const OnboardingScreen(),
       },
       home: const AuthWrapper(),
     );
