@@ -48,11 +48,26 @@ class MyApp extends StatelessWidget {
       initialRoute: '/splash',
       routes: {
         '/splash': (context) => const SplashScreen(),
-        '/home': (context) =>
-            const MainScreen(), // MainScreen فيها BottomNavigationBar
+        '/home': (context) => const MainScreen(),
         '/memorize': (context) => const MemorizeScreen(),
         '/onboarding': (context) => const OnboardingScreen(),
-        '/profile': (context) => const UserProfileScreen(),
+      },
+      onGenerateRoute: (settings) {
+        // Handle routes that need parameters
+        if (settings.name == '/profile') {
+          final user = FirebaseAuth.instance.currentUser;
+          if (user != null) {
+            return MaterialPageRoute(
+              builder: (context) => UserProfileScreen(user: user),
+            );
+          } else {
+            // If no user is logged in, redirect to onboarding
+            return MaterialPageRoute(
+              builder: (context) => const OnboardingScreen(),
+            );
+          }
+        }
+        return null;
       },
       home: const AuthWrapper(),
     );
