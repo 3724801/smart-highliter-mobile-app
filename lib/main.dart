@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'Screens/Auth/sign_in_screen.dart';
 import 'Screens/Splash/splash_screen.dart';
-import 'Screens/welcome_screen.dart';
+
 import 'Screens/main_screen.dart';
 import 'Screens/memorize_screen.dart';
 import 'Screens/Onboarding/onboarding_screen.dart';
