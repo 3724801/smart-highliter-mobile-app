@@ -27,6 +27,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   bool _isSearching = false;
+final Map<String, Color> namedColors = {
+  'lightblue': Colors.lightBlue,
+  'lightgreen': Colors.lightGreen,
+  'yellow': Colors.yellow,
+  'lightred': Colors.redAccent.shade100, // Or any red variant
+  // Add more if needed
+};
 
   // Voice functionality
   late stt.SpeechToText _speech;
