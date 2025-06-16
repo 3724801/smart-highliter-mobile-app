@@ -24,9 +24,9 @@ void main() async {
     await Firebase.initializeApp(options: firebaseOptions);
     await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
 
-    print("✅ Firebase initialized successfully");
+    print("Firebase initialized successfully");
   } catch (e) {
-    print("❌ Firebase initialization failed: $e");
+    print("Firebase initialization failed: $e");
   }
 
   runApp(const MyApp());
