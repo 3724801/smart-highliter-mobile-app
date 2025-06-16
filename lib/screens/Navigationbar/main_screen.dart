@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../Home/home_screen.dart';
+import '../Profile/profile_screen.dart'; // Add this import
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -13,7 +14,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const Center(child: Text('Profile Screen')),
+    const ProfileScreen(), // Replace with actual ProfileScreen
     const Center(child: Text('Settings Screen')),
   ];
 

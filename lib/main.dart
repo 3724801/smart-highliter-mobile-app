@@ -6,6 +6,7 @@ import 'Screens/Splash/splash_screen.dart';
 import 'Screens/Navigationbar/main_screen.dart';
 import 'Screens/memorize_screen.dart';
 import 'Screens/Onboarding/onboarding_screen.dart';
+import 'Screens/Profile/user_profile_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
