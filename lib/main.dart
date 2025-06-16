@@ -47,8 +47,8 @@ class MyApp extends StatelessWidget {
       initialRoute: '/splash',
       routes: {
         '/splash': (context) => const SplashScreen(),
-      
-        '/home': (context) => const MainScreen(), // MainScreen فيها BottomNavigationBar
+        '/home': (context) =>
+            const MainScreen(), // MainScreen فيها BottomNavigationBar
         '/memorize': (context) => const MemorizeScreen(),
         '/onboarding': (context) => const OnboardingScreen(),
       },
@@ -77,7 +77,7 @@ class AuthWrapper extends StatelessWidget {
           return const SizedBox.shrink();
         } else {
           // لو المستخدم مش مسجل دخول
-          return const WelcomeScreen();
+          return const OnboardingScreen();
         }
       },
     );
