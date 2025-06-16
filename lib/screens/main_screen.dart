@@ -47,8 +47,8 @@ class _MainScreenState extends State<MainScreen> {
             elevation: 0,
             currentIndex: _selectedIndex,
             onTap: _onItemTapped,
-            selectedItemColor: Colors.deepPurple,
-            unselectedItemColor: Colors.grey.shade500,
+            selectedItemColor: const Color.fromARGB(255, 89, 190, 221),
+            unselectedItemColor: const Color.fromARGB(255, 167, 178, 207),
             showUnselectedLabels: false,
             type: BottomNavigationBarType.fixed,
             items: [
@@ -62,7 +62,8 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  BottomNavigationBarItem _buildNavItem(IconData icon, String label, int index) {
+  BottomNavigationBarItem _buildNavItem(
+      IconData icon, String label, int index) {
     final isSelected = _selectedIndex == index;
     return BottomNavigationBarItem(
       label: label,
@@ -70,7 +71,9 @@ class _MainScreenState extends State<MainScreen> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.deepPurple.withOpacity(0.1) : Colors.transparent,
+          color: isSelected
+              ? Colors.deepPurple.withOpacity(0.1)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Icon(
