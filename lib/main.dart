@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'Screens/Splash/splash_screen.dart';
-import 'Screens/main_screen.dart';
+import 'Screens/Navigationbar/main_screen.dart';
 import 'Screens/memorize_screen.dart';
 import 'Screens/Onboarding/onboarding_screen.dart';
 
