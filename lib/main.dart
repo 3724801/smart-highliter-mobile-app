@@ -50,8 +50,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/splash',
       routes: {
         '/splash': (context) => const SplashScreen(),
-        '/welcome': (context) => const WelcomeScreen(),
-        '/signin': (context) => const SignInScreen(),
+      
         '/home': (context) => const MainScreen(), // MainScreen فيها BottomNavigationBar
         '/memorize': (context) => const MemorizeScreen(),
         '/onboarding': (context) => const OnboardingScreen(),
