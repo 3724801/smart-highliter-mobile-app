@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
+import 'package:speech_to_text/speech_to_text.dart' as  stt;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,11 +16,22 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   List<dynamic> highlights = [];
+  List<dynamic> filteredHighlights = [];
   bool isLoading = true;
   String? errorMessage;
   String? selectedPageUrl;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  
+  // Search functionality
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
+  bool _isSearching = false;
+  
+  // Voice functionality
+  late stt.SpeechToText _speech;
+  bool _isListening = false;
+  bool _speechAvailable = false;
 
   static const String baseUrl = 'http://localhost:5000';
 
@@ -37,12 +49,92 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       parent: _animationController,
       curve: Curves.easeInOut,
     ));
+    
+    _searchController.addListener(_onSearchChanged);
+    _initSpeech();
     fetchHighlights();
+  }
+
+  void _initSpeech() async {
+    _speech = stt.SpeechToText();
+    _speechAvailable = await _speech.initialize(
+      onStatus: (status) {
+        setState(() {
+          _isListening = status == 'listening';
+        });
+      },
+      onError: (error) {
+        setState(() {
+          _isListening = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Speech recognition error: ${error.errorMsg}'),
+            backgroundColor: Colors.red[600],
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        );
+      },
+    );
+  }
+
+  void _startListening() async {
+    if (_speechAvailable && !_isListening) {
+      await _speech.listen(
+        onResult: (result) {
+          setState(() {
+            _searchController.text = result.recognizedWords;
+          });
+        },
+        listenFor: const Duration(seconds: 30),
+        pauseFor: const Duration(seconds: 5),
+        partialResults: true,
+        localeId: 'en_US',
+      );
+    }
+  }
+
+  void _stopListening() async {
+    if (_isListening) {
+      await _speech.stop();
+    }
+  }
+
+  void _onSearchChanged() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      if (query.isEmpty) {
+        filteredHighlights = highlights;
+        _isSearching = false;
+      } else {
+        _isSearching = true;
+        filteredHighlights = highlights.where((highlight) {
+          final text = highlight['selectedText']?.toString().toLowerCase() ?? '';
+          final note = highlight['note']?.toString().toLowerCase() ?? '';
+          final pageTitle = highlight['pageTitle']?.toString().toLowerCase() ?? '';
+          final aiAnalysis = highlight['aiAnalysis']?.toString().toLowerCase() ?? '';
+          
+          return text.contains(query) || 
+                 note.contains(query) || 
+                 pageTitle.contains(query) ||
+                 aiAnalysis.contains(query);
+        }).toList();
+      }
+    });
+  }
+
+  void _clearSearch() {
+    _searchController.clear();
+    _searchFocusNode.unfocus();
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    _searchController.dispose();
+    _searchFocusNode.dispose();
+    _speech.cancel();
     super.dispose();
   }
 
@@ -95,6 +187,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         final data = json.decode(response.body);
         setState(() {
           highlights = data is List ? data : [];
+          filteredHighlights = highlights;
           isLoading = false;
         });
         _animationController.forward();
@@ -135,6 +228,60 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
+  Widget _buildSearchBar() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey[200]!,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: _searchController,
+        focusNode: _searchFocusNode,
+        decoration: InputDecoration(
+          hintText: 'Search highlights...',
+          hintStyle: TextStyle(color: Colors.grey[500]),
+          prefixIcon: Icon(Icons.search, color: Colors.grey[500]),
+          suffixIcon: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_searchController.text.isNotEmpty)
+                IconButton(
+                  icon: Icon(Icons.clear, color: Colors.grey[500]),
+                  onPressed: _clearSearch,
+                ),
+              Container(
+                margin: const EdgeInsets.only(right: 8),
+                decoration: BoxDecoration(
+                  color: _isListening ? const Color(0xFF06B6D4) : Colors.grey[100],
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: Icon(
+                    _isListening ? Icons.mic : Icons.mic_none,
+                    color: _isListening ? Colors.white : Colors.grey[600],
+                  ),
+                  onPressed: _speechAvailable
+                      ? (_isListening ? _stopListening : _startListening)
+                      : null,
+                ),
+              ),
+            ],
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -144,7 +291,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         title: Text(
-          selectedPageUrl == null ? 'My Highlights' : 'Page Highlights',
+          selectedPageUrl == null 
+              ? (_isSearching ? 'Search Results' : 'My Highlights') 
+              : 'Page Highlights',
           style: const TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 20,
@@ -186,7 +335,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
         ],
       ),
-      body: _buildBody(),
+      body: Column(
+        children: [
+          if (selectedPageUrl == null) _buildSearchBar(),
+          Expanded(child: _buildBody()),
+        ],
+      ),
       floatingActionButton: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
@@ -313,6 +467,61 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       );
     }
 
+    if (filteredHighlights.isEmpty && _isSearching) {
+      return Center(
+        child: Container(
+          margin: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey[200]!,
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.search_off,
+                  size: 48,
+                  color: Colors.grey[400],
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                "No results found",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Try different keywords or clear the search",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     if (highlights.isEmpty) {
       return Center(
         child: Container(
@@ -376,7 +585,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Widget _buildPageCards() {
     final Map<String, List<dynamic>> pages = {};
-    for (var highlight in highlights) {
+    for (var highlight in filteredHighlights) {
       final pageUrl = highlight['pageUrl']?.toString() ?? 'unknown';
       if (!pages.containsKey(pageUrl)) {
         pages[pageUrl] = [];
@@ -385,7 +594,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
       itemCount: pages.length,
       itemBuilder: (context, index) {
         final pageUrl = pages.keys.elementAt(index);
@@ -516,7 +725,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildPageHighlights() {
-    final pageHighlights = highlights.where((h) => h['pageUrl'] == selectedPageUrl).toList();
+    final pageHighlights = filteredHighlights.where((h) => h['pageUrl'] == selectedPageUrl).toList();
     if (pageHighlights.isEmpty) {
       return const Center(child: Text('No highlights found for this page'));
     }
@@ -754,6 +963,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         content: Container(
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey[300]!),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(12),
           ),
           child: TextField(

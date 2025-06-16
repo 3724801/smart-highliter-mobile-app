@@ -2,10 +2,11 @@ import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+
 import 'Screens/Auth/sign_in_screen.dart';
 import 'Screens/splash_screen.dart';
 import 'Screens/welcome_screen.dart';
-import 'Screens/Home/home_screen.dart';
+import 'Screens/main_screen.dart';
 import 'Screens/memorize_screen.dart';
 import 'Screens/intro_screen.dart';
 
@@ -13,7 +14,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    // Initialize Firebase
     FirebaseOptions firebaseOptions = const FirebaseOptions(
       apiKey: "AIzaSyDCy5UbtFzEIzoaxlgoCwJWKVRxskWp8y4",
       authDomain: "smart-highlighter-b1d3b.firebaseapp.com",
@@ -25,10 +25,8 @@ void main() async {
     );
 
     await Firebase.initializeApp(options: firebaseOptions);
-    
-    // Set persistence to LOCAL to maintain session
     await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
-    
+
     print("✅ Firebase initialized successfully");
   } catch (e) {
     print("❌ Firebase initialization failed: $e");
@@ -49,17 +47,16 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       debugShowCheckedModeBanner: false,
-     initialRoute: '/splash',
-routes: {
-  '/splash': (context) => const SplashScreen(),
-  '/welcome': (context) => const WelcomeScreen(),
-  '/signin': (context) => const SignInScreen(),
-  '/home': (context) => const HomeScreen(),
-  '/memorize': (context) => const MemorizeScreen(),
-  '/intro': (context) => const IntroScreen(),
-},
+      initialRoute: '/splash',
+      routes: {
+        '/splash': (context) => const SplashScreen(),
+        '/welcome': (context) => const WelcomeScreen(),
+        '/signin': (context) => const SignInScreen(),
+        '/home': (context) => const MainScreen(), // MainScreen فيها BottomNavigationBar
+        '/memorize': (context) => const MemorizeScreen(),
+        '/intro': (context) => const IntroScreen(),
+      },
       home: const AuthWrapper(),
-      // home: const SplashScreen(), // Uncomment this line to use SplashScreen as the initial screen
     );
   }
 }
@@ -77,10 +74,13 @@ class AuthWrapper extends StatelessWidget {
         }
 
         if (snapshot.hasData) {
-          // User is logged in
-          return const IntroScreen();
+          // لو المستخدم مسجل دخول، انتقلي تلقائيًا إلى /home
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.pushReplacementNamed(context, '/home');
+          });
+          return const SizedBox.shrink();
         } else {
-          // User is not logged in
+          // لو المستخدم مش مسجل دخول
           return const WelcomeScreen();
         }
       },

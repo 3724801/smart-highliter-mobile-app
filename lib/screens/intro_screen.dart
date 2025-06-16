@@ -392,7 +392,7 @@ class _IntroScreenState extends State<IntroScreen>
                                     child: ElevatedButton(
                                       onPressed: () {
                                         Navigator.pushReplacementNamed(
-                                            context, '/home');
+                                            context, '/signin');
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.white,

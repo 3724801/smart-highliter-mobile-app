@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class UserProfileScreen extends StatefulWidget {
-  final User user;  // Add required user parameter
+  final User user;
 
   const UserProfileScreen({super.key, required this.user});
 
@@ -70,6 +70,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     });
   }
 
+  Future<void> _signOut() async {
+    await FirebaseAuth.instance.signOut();
+    if (mounted) {
+      Navigator.of(context).pushReplacementNamed('/sign-in'); // Make sure this route exists
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,44 +100,50 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 children: [
                   GestureDetector(
                     onTap: _isEditing ? _pickAvatar : null,
-                    child: CircleAvatar(
-                      radius: 60,
-                      backgroundImage: _avatarPath != null
-                          ? FileImage(File(_avatarPath!))
-                          : (widget.user.photoURL != null
-                          ? NetworkImage(widget.user.photoURL!)
-                          : const AssetImage('assets/images/avatar2.png')) as ImageProvider,
-                      child: _isEditing
-                          ? Container(
-                        decoration: BoxDecoration(
-                          color: Colors.black54,
-                          shape: BoxShape.circle,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 60,
+                          backgroundImage: _avatarPath != null
+                              ? FileImage(File(_avatarPath!))
+                              : (widget.user.photoURL != null
+                                  ? NetworkImage(widget.user.photoURL!)
+                                  : const AssetImage('assets/images/avatar2.png')) as ImageProvider,
                         ),
-                        child: const Icon(Icons.edit, color: Colors.white, size: 30),
-                      )
-                          : null,
+                        if (_isEditing)
+                          Container(
+                            width: 120,
+                            height: 120,
+                            decoration: BoxDecoration(
+                              color: Colors.black38,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.edit, color: Colors.white, size: 30),
+                          ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 20),
                   _isEditing
                       ? TextField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Name',
-                      border: OutlineInputBorder(),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.cyan),
-                      ),
-                    ),
-                  )
+                          controller: _nameController,
+                          decoration: const InputDecoration(
+                            labelText: 'Name',
+                            border: OutlineInputBorder(),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.cyan),
+                            ),
+                          ),
+                        )
                       : Text(
-                    _nameController.text,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.cyan[300],
-                    ),
-                  ),
+                          _nameController.text,
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.cyan[300],
+                          ),
+                        ),
                   const SizedBox(height: 10),
                   Text(
                     _emailController.text,
@@ -169,6 +182,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
                 child: const Text('Edit Profile'),
               ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: _signOut,
+              icon: const Icon(Icons.logout),
+              label: const Text('Logout'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
           ],
         ),
       ),
