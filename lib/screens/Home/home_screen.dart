@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
-import 'package:speech_to_text/speech_to_text.dart' as  stt;
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,12 +22,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String? selectedPageUrl;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-  
+
   // Search functionality
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   bool _isSearching = false;
-  
+
   // Voice functionality
   late stt.SpeechToText _speech;
   bool _isListening = false;
@@ -49,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       parent: _animationController,
       curve: Curves.easeInOut,
     ));
-    
+
     _searchController.addListener(_onSearchChanged);
     _initSpeech();
     fetchHighlights();
@@ -72,7 +72,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             content: Text('Speech recognition error: ${error.errorMsg}'),
             backgroundColor: Colors.red[600],
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
         );
       },
@@ -110,15 +111,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       } else {
         _isSearching = true;
         filteredHighlights = highlights.where((highlight) {
-          final text = highlight['selectedText']?.toString().toLowerCase() ?? '';
+          final text =
+              highlight['selectedText']?.toString().toLowerCase() ?? '';
           final note = highlight['note']?.toString().toLowerCase() ?? '';
-          final pageTitle = highlight['pageTitle']?.toString().toLowerCase() ?? '';
-          final aiAnalysis = highlight['aiAnalysis']?.toString().toLowerCase() ?? '';
-          
-          return text.contains(query) || 
-                 note.contains(query) || 
-                 pageTitle.contains(query) ||
-                 aiAnalysis.contains(query);
+          final pageTitle =
+              highlight['pageTitle']?.toString().toLowerCase() ?? '';
+          final aiAnalysis =
+              highlight['aiAnalysis']?.toString().toLowerCase() ?? '';
+
+          return text.contains(query) ||
+              note.contains(query) ||
+              pageTitle.contains(query) ||
+              aiAnalysis.contains(query);
         }).toList();
       }
     });
@@ -165,10 +169,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           headers: {'Content-Type': 'application/json'},
         ).timeout(const Duration(seconds: 5));
 
-        print('💓 Health check status: ${healthResponse.statusCode}');
-        print('💓 Health check body: ${healthResponse.body}');
+        print('Health check status: ${healthResponse.statusCode}');
+        print('Health check body: ${healthResponse.body}');
       } catch (e) {
-        print('❌ Health check failed: $e');
+        print('Health check failed: $e');
       }
 
       final response = await http.get(
@@ -179,9 +183,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         },
       ).timeout(const Duration(seconds: 10));
 
-      print('📊 Response status: ${response.statusCode}');
-      print('📊 Response headers: ${response.headers}');
-      print('📊 Response body: ${response.body}');
+      print('Response status: ${response.statusCode}');
+      print('Response headers: ${response.headers}');
+      print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -191,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           isLoading = false;
         });
         _animationController.forward();
-        print('✅ Successfully loaded ${highlights.length} highlights');
+        print('Successfully loaded ${highlights.length} highlights');
       } else {
         setState(() {
           errorMessage =
@@ -202,29 +206,29 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     } on SocketException catch (e) {
       setState(() {
         errorMessage =
-            "❌ Cannot connect to server at $baseUrl. Is the server running?";
+            "Cannot connect to server at $baseUrl. Is the server running?";
         isLoading = false;
       });
-      print('🔌 Socket Exception: $e');
+      print('Socket Exception: $e');
     } on TimeoutException catch (e) {
       setState(() {
         errorMessage =
-            "⏱️ Request timeout. Server might be slow or not responding.";
+            "Request timeout. Server might be slow or not responding.";
         isLoading = false;
       });
-      print('⏱️ Timeout Exception: $e');
+      print('Timeout Exception: $e');
     } on FormatException catch (e) {
       setState(() {
-        errorMessage = "📋 Invalid response format from server";
+        errorMessage = "Invalid response format from server";
         isLoading = false;
       });
-      print('📋 Format Exception: $e');
+      print('Format Exception: $e');
     } catch (e) {
       setState(() {
-        errorMessage = "🚨 Error: $e";
+        errorMessage = "Error: $e";
         isLoading = false;
       });
-      print('🚨 General Exception: $e');
+      print('General Exception: $e');
     }
   }
 
@@ -260,7 +264,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               Container(
                 margin: const EdgeInsets.only(right: 8),
                 decoration: BoxDecoration(
-                  color: _isListening ? const Color(0xFF06B6D4) : Colors.grey[100],
+                  color:
+                      _isListening ? const Color(0xFF06B6D4) : Colors.grey[100],
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
@@ -276,7 +281,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ],
           ),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
       ),
     );
@@ -291,8 +297,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         title: Text(
-          selectedPageUrl == null 
-              ? (_isSearching ? 'Search Results' : 'My Highlights') 
+          selectedPageUrl == null
+              ? (_isSearching ? 'Search Results' : 'My Highlights')
               : 'Page Highlights',
           style: const TextStyle(
             fontWeight: FontWeight.w600,
@@ -453,13 +459,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue[600],
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   elevation: 0,
                 ),
-                child: const Text('Retry', style: TextStyle(fontWeight: FontWeight.w600)),
+                child: const Text('Retry',
+                    style: TextStyle(fontWeight: FontWeight.w600)),
               ),
             ],
           ),
@@ -579,7 +587,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     return FadeTransition(
       opacity: _fadeAnimation,
-      child: selectedPageUrl != null ? _buildPageHighlights() : _buildPageCards(),
+      child:
+          selectedPageUrl != null ? _buildPageHighlights() : _buildPageCards(),
     );
   }
 
@@ -600,7 +609,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         final pageUrl = pages.keys.elementAt(index);
         final pageHighlights = pages[pageUrl]!;
         final firstHighlight = pageHighlights.first;
-        
+
         return Container(
           margin: const EdgeInsets.only(bottom: 16),
           child: Material(
@@ -641,12 +650,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 child: Center(
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue[600]!),
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.blue[600]!),
                                   ),
                                 ),
                               );
                             },
-                            errorBuilder: (context, error, stackTrace) => Container(
+                            errorBuilder: (context, error, stackTrace) =>
+                                Container(
                               color: Colors.grey[100],
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -676,7 +687,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            firstHighlight['pageTitle']?.toString() ?? 'Untitled Page',
+                            firstHighlight['pageTitle']?.toString() ??
+                                'Untitled Page',
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
@@ -689,7 +701,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
                                   color: Colors.blue[50],
                                   borderRadius: BorderRadius.circular(20),
@@ -725,7 +738,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildPageHighlights() {
-    final pageHighlights = filteredHighlights.where((h) => h['pageUrl'] == selectedPageUrl).toList();
+    final pageHighlights = filteredHighlights
+        .where((h) => h['pageUrl'] == selectedPageUrl)
+        .toList();
     if (pageHighlights.isEmpty) {
       return const Center(child: Text('No highlights found for this page'));
     }
@@ -869,7 +884,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           child: IconButton(
                             icon: const Icon(Icons.delete_outline, size: 18),
                             color: Colors.red[600],
-                            onPressed: () => _deleteHighlight(highlight['id']?.toString()),
+                            onPressed: () =>
+                                _deleteHighlight(highlight['id']?.toString()),
                           ),
                         ),
                       ],
@@ -903,7 +919,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red[600],
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
             child: const Text('Delete'),
           ),
@@ -924,7 +941,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             content: const Text('Highlight deleted successfully'),
             backgroundColor: Colors.green[600],
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
         );
         await fetchHighlights();
@@ -934,7 +952,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             content: Text('Failed to delete: ${response.body}'),
             backgroundColor: Colors.red[600],
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
         );
       }
@@ -986,7 +1005,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue[600],
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
             child: const Text('Save'),
           ),
@@ -1008,7 +1028,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               content: const Text('Highlight updated successfully'),
               backgroundColor: Colors.green[600],
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
           );
           await fetchHighlights();
@@ -1018,7 +1039,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               content: Text('Failed to update: ${response.body}'),
               backgroundColor: Colors.red[600],
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
           );
         }
@@ -1028,7 +1050,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             content: Text('Error updating highlight: $e'),
             backgroundColor: Colors.red[600],
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
         );
       }
