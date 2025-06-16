@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../Home/home_screen.dart';
-import '../Profile/user_profile_screen.dart'; // Add this import
+import '../Profile/user_profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -12,11 +13,16 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const UserProfileScreen(), // Replace with actual ProfileScreen
-    const Center(child: Text('Settings Screen')),
-  ];
+  List<Widget> get _screens {
+    final user = FirebaseAuth.instance.currentUser;
+    return [
+      const HomeScreen(),
+      user != null 
+        ? UserProfileScreen(user: user)
+        : const Center(child: Text('Please log in to view profile')),
+      const Center(child: Text('Settings Screen')),
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {
