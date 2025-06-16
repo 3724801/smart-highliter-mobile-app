@@ -27,13 +27,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   bool _isSearching = false;
-final Map<String, Color> namedColors = {
-  'lightblue': Colors.lightBlue,
-  'lightgreen': Colors.lightGreen,
-  'yellow': Colors.yellow,
-  'lightred': Colors.redAccent.shade100, // Or any red variant
-  // Add more if needed
-};
+  final Map<String, Color> namedColors = {
+    'lightblue': Colors.lightBlue,
+    'lightgreen': Colors.lightGreen,
+    'yellow': Colors.yellow,
+    'lightred': Colors.redAccent.shade100, // Or any red variant
+    // Add more if needed
+  };
 
   // Voice functionality
   late stt.SpeechToText _speech;
@@ -759,10 +759,12 @@ final Map<String, Color> namedColors = {
         final highlight = pageHighlights[index];
         Color accentColor;
         try {
-          final colorHex = highlight['color']?.toString() ?? '#3B82F6';
-          accentColor = Color(int.parse(colorHex.replaceFirst('#', '0xff')));
+          final colorName = highlight['color']
+              ?.toString()
+              ?.toLowerCase(); // make sure it's lowercase
+          accentColor = namedColors[colorName] ?? Colors.blue[600]!;
         } catch (e) {
-          accentColor = Colors.blue[600]!;
+          accentColor = Colors.blue[600]!; // Fallback
         }
 
         return Container(
