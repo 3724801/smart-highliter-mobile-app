@@ -52,6 +52,7 @@ class MyApp extends StatelessWidget {
             const MainScreen(), // MainScreen فيها BottomNavigationBar
         '/memorize': (context) => const MemorizeScreen(),
         '/onboarding': (context) => const OnboardingScreen(),
+        '/profile': (context) => const UserProfileScreen(),
       },
       home: const AuthWrapper(),
     );
